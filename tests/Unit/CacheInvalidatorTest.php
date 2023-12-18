@@ -274,6 +274,7 @@ class CacheInvalidatorTest extends TestCase
     public function testFlushOnLazyLoaded() {
         $proxyClient = \Mockery::mock(HttpProxyClient::class, LazyObjectInterface::class, PurgeCapable::class);
         $proxyClient->shouldReceive('flush')->andReturn(1);
+        $proxyClient->shouldReceive('purge');
 
         $cacheInvalidator = new CacheInvalidator($proxyClient);
         $cacheInvalidator->invalidatePath('/foo');
