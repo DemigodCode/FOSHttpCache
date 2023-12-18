@@ -37,6 +37,7 @@
         "php-http/mock-client": "^1.6.0",
         "symfony/process": "^6.4|| ^7.0",
         "symfony/http-kernel": "^6.4|| ^7.0",
+        "symfony/var-dumper": "^6.4|| ^7.0",
         "phpunit/phpunit": "^9"
     },
     "conflict": {

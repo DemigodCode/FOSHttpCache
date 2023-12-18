@@ -17,6 +17,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 class FastlyTest extends TestCase
 {

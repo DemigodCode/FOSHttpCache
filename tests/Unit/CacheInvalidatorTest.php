@@ -17,6 +17,7 @@ use FOS\HttpCache\Exception\ExceptionCollection;
 use FOS\HttpCache\Exception\ProxyResponseException;
 use FOS\HttpCache\Exception\ProxyUnreachableException;
 use FOS\HttpCache\Exception\UnsupportedProxyOperationException;
+use FOS\HttpCache\ProxyClient\HttpProxyClient;
 use FOS\HttpCache\ProxyClient\Invalidation\BanCapable;
 use FOS\HttpCache\ProxyClient\Invalidation\PurgeCapable;
 use FOS\HttpCache\ProxyClient\Invalidation\RefreshCapable;
@@ -32,6 +33,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 class CacheInvalidatorTest extends TestCase
 {
@@ -251,5 +253,30 @@ class CacheInvalidatorTest extends TestCase
         $cacheInvalidator->setEventDispatcher($eventDispatcher);
         $this->expectException(\Exception::class);
         $cacheInvalidator->setEventDispatcher($eventDispatcher);
+    }
+
+    public function testSkipFlushOnEmptyInvalidationsAndLazyLoaded() {
+        $proxyClient = \Mockery::mock(HttpProxyClient::class, LazyObjectInterface::class);
+        $proxyClient->shouldNotReceive('flush');
+
+        $cacheInvalidator = new CacheInvalidator($proxyClient);
+        $cacheInvalidator->flush();
+    }
+
+    public function testFlushOnNotLazyLoaded() {
+        $proxyClient = \Mockery::mock(HttpProxyClient::class);
+        $proxyClient->shouldReceive('flush')->andReturn(0);
+
+        $cacheInvalidator = new CacheInvalidator($proxyClient);
+        $cacheInvalidator->flush();
+    }
+
+    public function testFlushOnLazyLoaded() {
+        $proxyClient = \Mockery::mock(HttpProxyClient::class, LazyObjectInterface::class);
+        $proxyClient->shouldReceive('flush')->andReturn(1);
+
+        $cacheInvalidator = new CacheInvalidator($proxyClient);
+        $cacheInvalidator->invalidatePath('/foo');
+        $cacheInvalidator->flush();
     }
 }
