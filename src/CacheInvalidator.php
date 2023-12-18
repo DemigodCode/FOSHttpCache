@@ -25,6 +25,7 @@ use FOS\HttpCache\ProxyClient\ProxyClient;
 use FOS\HttpCache\ProxyClient\Symfony;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 use Toflar\Psr6HttpCacheStore\Psr6Store;
 
 /**
@@ -298,7 +299,10 @@ class CacheInvalidator
     public function flush()
     {
         try {
-            return $this->cache->flush();
+            if(!$this->cache instanceof LazyObjectInterface || $this->cache->isLazyObjectInitialized())
+            {
+                return $this->cache->flush();
+            }
         } catch (ExceptionCollection $exceptions) {
             foreach ($exceptions as $exception) {
                 $event = new Event();
