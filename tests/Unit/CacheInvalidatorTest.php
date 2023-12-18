@@ -258,6 +258,7 @@ class CacheInvalidatorTest extends TestCase
     public function testSkipFlushOnEmptyInvalidationsAndLazyLoaded() {
         $proxyClient = \Mockery::mock(HttpProxyClient::class, LazyObjectInterface::class);
         $proxyClient->shouldNotReceive('flush');
+        $proxyClient->shouldReceive('isLazyObjectInitialized')->andReturn(false);
 
         $cacheInvalidator = new CacheInvalidator($proxyClient);
         $this->assertEquals(0, $cacheInvalidator->flush());
@@ -266,6 +267,7 @@ class CacheInvalidatorTest extends TestCase
     public function testFlushOnNotLazyLoaded() {
         $proxyClient = \Mockery::mock(HttpProxyClient::class);
         $proxyClient->shouldReceive('flush')->andReturn(0);
+        $proxyClient->shouldNotReceive('isLazyObjectInitialized');
 
         $cacheInvalidator = new CacheInvalidator($proxyClient);
         $this->assertEquals(0, $cacheInvalidator->flush());
@@ -275,6 +277,7 @@ class CacheInvalidatorTest extends TestCase
         $proxyClient = \Mockery::mock(HttpProxyClient::class, LazyObjectInterface::class, PurgeCapable::class);
         $proxyClient->shouldReceive('flush')->andReturn(1);
         $proxyClient->shouldReceive('purge');
+        $proxyClient->shouldReceive('isLazyObjectInitialized')->andReturn(true);
 
         $cacheInvalidator = new CacheInvalidator($proxyClient);
         $cacheInvalidator->invalidatePath('/foo');
