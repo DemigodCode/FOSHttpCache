@@ -303,6 +303,7 @@ class CacheInvalidator
             {
                 return $this->cache->flush();
             }
+            return 0;
         } catch (ExceptionCollection $exceptions) {
             foreach ($exceptions as $exception) {
                 $event = new Event();
